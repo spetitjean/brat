@@ -2342,7 +2342,7 @@ Util.profileStart('arcs');
 
             // TODO: on at least Chrome, this doesn't make a difference:
             // the lines come out pixel-width even without it. Check.
-            height += 0.5;
+            height += 16.5;
           }
           var leftSlantBound, rightSlantBound;
 

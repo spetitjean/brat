@@ -58,7 +58,7 @@ svg.reselect {
 
 /* "basic" font */
 text {
-  font-size: 13px;
+  font-size: 18px;
   font-family: 'Liberation Sans', Verdana, Arial, Helvetica, sans-serif;
 }
 
@@ -75,7 +75,7 @@ path {
 /* "basic" font */
 .span text {
   /*  font-size: 10.5px; */
-  font-size: 10px;
+  font-size: 14px;
   text-anchor: middle;
   font-family: 'PT Sans Caption', sans-serif;
   pointer-events: none;
@@ -282,7 +282,7 @@ rect.shadow_EditHighlight {
 }
 
 .arcs text {
-  font-size: 9px;
+  font-size: 14px;
   text-anchor: middle;
   font-family: 'PT Sans Caption', sans-serif;
   /* dominant-baseline: central; */
