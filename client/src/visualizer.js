@@ -2342,7 +2342,7 @@ Util.profileStart('arcs');
 
             // TODO: on at least Chrome, this doesn't make a difference:
             // the lines come out pixel-width even without it. Check.
-            height += 16.5;
+            height += 0.5;
           }
           var leftSlantBound, rightSlantBound;
 
@@ -3363,23 +3363,23 @@ Util.profileStart('before render');
           // dense
           Configuration.visual.margin = { x: 1, y: 0 };
           Configuration.visual.boxSpacing = 1;
-          Configuration.visual.curlyHeight = 1;
-          Configuration.visual.arcSpacing = 7;
-          Configuration.visual.arcStartHeight = 18
+          Configuration.visual.curlyHeight = 11;
+          Configuration.visual.arcSpacing = 27;
+          Configuration.visual.arcStartHeight = 38
         } else if(_density > 2) {
           // spacious
           Configuration.visual.margin = { x: 2, y: 1 };
           Configuration.visual.boxSpacing = 3;
-          Configuration.visual.curlyHeight = 6;
-          Configuration.visual.arcSpacing = 12;
-          Configuration.visual.arcStartHeight = 23;
+          Configuration.visual.curlyHeight = 16;
+          Configuration.visual.arcSpacing = 32;
+          Configuration.visual.arcStartHeight = 43;
         } else {
           // standard
           Configuration.visual.margin = { x: 2, y: 1 };
           Configuration.visual.boxSpacing = 1;
-          Configuration.visual.curlyHeight = 4;
-          Configuration.visual.arcSpacing = 9;
-          Configuration.visual.arcStartHeight = 19;
+          Configuration.visual.curlyHeight = 14;
+          Configuration.visual.arcSpacing = 29;
+          Configuration.visual.arcStartHeight = 39;
         }
         dispatcher.post('configurationChanged');
       }

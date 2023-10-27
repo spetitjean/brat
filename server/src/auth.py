@@ -130,6 +130,16 @@ def allowed_to_read(real_path):
     if user is None:
         user = 'guest'
 
+
+    # Convention to keep files private, all users have one directory at the root of the project
+    if len(data_path.split('/')) > 3:
+        user_dir = data_path.split('/')[2]
+        Messager.error('User_dir: ' + user_dir)
+        Messager.error('data_path: ' + data_path)
+        if user_dir != user:
+            return False
+        
+
     #display_message('Path: %s, dir: %s, user: %s, ' % (data_path, real_dir, user), type='error', duration=-1)
 
     return robotparser.can_fetch(user, data_path)

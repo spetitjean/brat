@@ -467,6 +467,7 @@ def _is_hidden(file_name):
 def _listdir(directory):
     # return listdir(directory)
     try:
+        Messager.error(directory)
         assert_allowed_to_read(directory)
         return [f for f in listdir(directory) if not _is_hidden(f)
                 and allowed_to_read(path_join(directory, f))]
