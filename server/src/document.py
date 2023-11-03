@@ -908,7 +908,7 @@ def _document_json_dict(document):
                     s_i += 1
 
         _enrich_json_with_data(j_dic, ann_obj)
-
+    Messager.error(j_dic)
     return j_dic
 
 

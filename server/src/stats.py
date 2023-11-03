@@ -101,6 +101,8 @@ def get_statistics(directory, base_names, use_cache=True):
     if options_get_validation(directory) != 'none':
         stat_types.append(("Issues", "int"))
 
+    stat_types.append(("Annotations", "int"))
+        
     if generate:
         # Generate the document statistics from scratch
         from annotation import JOINED_ANN_FILE_SUFF
@@ -114,9 +116,9 @@ def get_statistics(directory, base_names, use_cache=True):
                     rel_count = (len([a for a in ann_obj.get_relations()]) +
                                  len([a for a in ann_obj.get_equivs()]))
                     event_count = len([a for a in ann_obj.get_events()])
-
+                    annotation_count = 1
                     if options_get_validation(directory) == 'none':
-                        docstats.append([tb_count, rel_count, event_count])
+                        docstats.append([tb_count, rel_count, event_count, annotation_count])
                     else:
                         # verify and include verification issue count
                         try:
@@ -129,7 +131,7 @@ def get_statistics(directory, base_names, use_cache=True):
                             # TODO: error reporting
                             issue_count = -1
                         docstats.append(
-                            [tb_count, rel_count, event_count, issue_count])
+                            [tb_count, rel_count, event_count, issue_count, annotation_count])
             except Exception as e:
                 log_info('Received "%s" when trying to generate stats' % e)
                 # Pass exceptions silently, just marking stats missing

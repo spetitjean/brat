@@ -127,7 +127,8 @@ from os.path import splitext, dirname, isfile, isdir, exists
 from re import compile as re_compile
 from re import match as re_match
 from time import time
-
+from session import get_session, invalidate_session
+from datetime import datetime
 
 try:
     from common import ProtocolError
@@ -497,6 +498,7 @@ class Annotations(object):
             '*': self._parse_equiv_annotation,
             'E': self._parse_event_annotation,
             '#': self._parse_comment_annotation,
+            '%': self._parse_code_comment_annotation,
         }
 
         # TODO: DOC!
@@ -1062,6 +1064,9 @@ class Annotations(object):
             data_tail,
             source_id=input_file_path)
 
+    def _parse_code_comment_annotation(self, _id, data, data_tail, input_file_path):
+        pass
+    
     def _parse_comment_annotation(self, _id, data, data_tail, input_file_path):
         try:
             _type, target = data.split()
@@ -1083,6 +1088,10 @@ class Annotations(object):
         for self.ann_line in ann_lines:
             self.ann_line_num += 1
             try:
+                # comment processing
+                if self.ann_line.strip()[0] == '%':
+                    # ignore lines starting with %
+                    continue
                 # ID processing
                 try:
                     id, id_tail = self.ann_line.split('\t', 1)
@@ -1091,7 +1100,7 @@ class Annotations(object):
                         self.ann_line, self.ann_line_num + 1, input_file_path)
 
                 pre = annotation_id_prefix(id)
-
+ 
                 if id in self._ann_by_id and pre != '*':
                     raise DuplicateAnnotationIdError(
                         id, self.ann_line, self.ann_line_num + 1, input_file_path)
@@ -1236,9 +1245,9 @@ class Annotations(object):
                     #       files, but the client will already have the version
                     #       at this stage leading to potential problems upon
                     #       the next change to the file.
+                    tmp_file.write("% Last annotated by " + get_session().get('user') + ", " + str(datetime.now()) + "\n")
                     tmp_file.write(out_str)
                     tmp_file.flush()
-
                     try:
                         # read only, because we write manually using copyfile; this prevents certain reentrant errors
                         with Annotations(tmp_file.name, read_only=True) as ann:

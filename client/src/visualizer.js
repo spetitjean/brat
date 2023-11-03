@@ -1497,7 +1497,7 @@ Util.profileStart('chunks');
         row.sentence = ++sentenceNumber;
         row.backgroundIndex = sentenceToggle;
         row.index = rowIndex;
-        var twoBarWidths; // HACK to avoid measuring space's width
+	var twoBarWidths; // HACK to avoid measuring space's width
         var openTextHighlights = {};
         var textMarkedRows = [];
 
@@ -1972,7 +1972,7 @@ Util.profileStart('chunks');
             while (sentenceNumber < chunk.sentence) {
               sentenceNumber++;
               row.arcs = svg.group(row.group, { 'class': 'arcs' });
-              rows.push(row);
+	      rows.push(row);
               row = new Row(svg);
               sentenceToggle = 1 - sentenceToggle;
               row.backgroundIndex = sentenceToggle;
@@ -2015,7 +2015,8 @@ Util.profileStart('chunks');
 
             // new row
             rows.push(row);
-
+	      console.log("HERE PUSH");
+	      console.log(rows);
             svg.remove(chunk.group);
             row = new Row(svg);
             row.backgroundIndex = sentenceToggle;
@@ -2090,7 +2091,6 @@ Util.profileStart('chunks');
 
           currentX += rtlmode ? -boxWidth : boxWidth;
         }); // chunks
-
         if (!lastChunk) {
           // nothing here
           drawing = false;

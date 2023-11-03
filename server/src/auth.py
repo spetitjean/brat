@@ -134,8 +134,6 @@ def allowed_to_read(real_path):
     # Convention to keep files private, all users have one directory at the root of the project
     if len(data_path.split('/')) > 3:
         user_dir = data_path.split('/')[2]
-        Messager.error('User_dir: ' + user_dir)
-        Messager.error('data_path: ' + data_path)
         if user_dir != user:
             return False
         
