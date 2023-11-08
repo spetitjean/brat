@@ -857,14 +857,59 @@ def _enrich_json_with_data(j_dic, ann_obj):
     j_dic['other_users'] = other_users
     
     path_exists = dict()
+    path_content = dict()
+    path_indices = dict()
+    path_annotations = dict()
+    was_annotated = dict()
     for user in other_users:
         #check if there is a ann file
-        if os.path.exists('/'.join([project_path] + [user] + rel_path_to_doc[2:]) + '.ann'):
+        other_path = '/'.join([project_path] + [user] + rel_path_to_doc[2:]) + '.ann'
+        if os.path.exists(other_path):
             path_exists[user] = 'yes'
+            other_file_lines = open(other_path, 'r').readlines()
+            path_content[user] = other_file_lines
+            # we only need the start and end indices of items (relations cannot exist without items)
+            all_indices = set()
+            sentences_annotated = set()
+            # maps sentences to the set of existing annotators for them
+            for other_file_line in other_file_lines:
+                other_split = other_file_line.split('\t')
+                if other_split[0][0] == 'T':
+                    new_split = other_split[1].split()
+                    all_indices.add(int(new_split[1]))
+                    all_indices.add(int(new_split[2]))
+                sorted_indices = sorted(list(all_indices))
+            path_indices[user] = sorted_indices
+            # check which sentences are annotated: for each offset (start-end of sentence), we look for one item in it
+            annotated_sentences = list()
+            sentence_number = 0
+            current_index = 0
+            for begin, end in j_dic['sentence_offsets']:
+                sentence_number += 1
+                if sentence_number not in was_annotated:
+                    was_annotated[sentence_number] = list()
+                current_item = sorted_indices[current_index]
+                while current_item < begin:
+                    current_index += 1
+                    if current_index < len(sorted_indices):
+                        current_item = sorted_indices[current_index]
+                    else:
+                        break
+                if begin < current_item < end:
+                    annotated_sentences.append(sentence_number)
+                    was_annotated[sentence_number].append(user)
+            path_annotations[user] = annotated_sentences
+                
+                    
         else:
             path_exists[user] = 'no'
     j_dic['path_exists'] = path_exists
-        
+    j_dic['path_content'] = path_content
+    j_dic['path_indices'] = path_indices
+    j_dic['path_annotations'] = path_annotations
+    j_dic['was_annotated'] = was_annotated
+    
+    
     
 def _enrich_json_with_base(j_dic):
     # TODO: Make the names here and the ones in the Annotations object conform

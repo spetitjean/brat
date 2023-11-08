@@ -1,7 +1,7 @@
 // vim:set ft=javascript ts=2 sw=2 sts=2 cindent:
 
 var Visualizer = (function($, window, undefined) {
-    var DocumentData = function(text, document, collection) {
+    var DocumentData = function(text, document, collection, was_annotated) {
       this.text = text;
       this.chunks = [];
       this.spans = {};
@@ -14,6 +14,7 @@ var Visualizer = (function($, window, undefined) {
       this.towers = {};
       this.document = document;
       this.collection = collection;
+      this.was_annotated = was_annotated;
       // this.sizes = {};
     };
 
@@ -540,8 +541,8 @@ var Visualizer = (function($, window, undefined) {
         if (!args) args = {};
         sourceData = _sourceData;
           dispatcher.post('newSourceData', [sourceData]);
-	  console.log(sourceData);
-          data = new DocumentData(sourceData.text, sourceData.document, sourceData.collection);
+	  //console.log(sourceData);
+          data = new DocumentData(sourceData.text, sourceData.document, sourceData.collection, sourceData.was_annotated);
 
         // collect annotation data
         $.each(sourceData.entities, function(entityNo, entity) {
@@ -2018,8 +2019,6 @@ Util.profileStart('chunks');
 
             // new row
             rows.push(row);
-	      console.log("HERE PUSH");
-	      console.log(rows);
             svg.remove(chunk.group);
             row = new Row(svg);
             row.backgroundIndex = sentenceToggle;
@@ -2835,7 +2834,8 @@ Util.profileStart('rows');
             // Render sentence number as a link
               var text;
 	      // Need to compute (or get from server) this number
-	      var sent_ann_info = "annotations for sentence " + row.sentence + ", file " + data.collection + data.document; 
+	      //var sent_ann_info = "annotations for sentence " + row.sentence + ", file " + data.collection + data.document; 
+	      var sent_ann_info = "Annotated by: " + data.was_annotated[row.sentence]; 
             if (rtlmode) {
               text = svg.text(link, canvasWidth - sentNumMargin + Configuration.visual.margin.x, y - rowPadding,
                   '' + row.sentence, { 'data-sent': row.sentence });
