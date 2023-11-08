@@ -1,7 +1,7 @@
 // vim:set ft=javascript ts=2 sw=2 sts=2 cindent:
 
 var Visualizer = (function($, window, undefined) {
-    var DocumentData = function(text) {
+    var DocumentData = function(text, document, collection) {
       this.text = text;
       this.chunks = [];
       this.spans = {};
@@ -12,6 +12,8 @@ var Visualizer = (function($, window, undefined) {
       this.markedSent = {};
       this.spanAnnTexts = {};
       this.towers = {};
+      this.document = document;
+      this.collection = collection;
       // this.sizes = {};
     };
 
@@ -318,7 +320,7 @@ var Visualizer = (function($, window, undefined) {
       var minArcSlant = 8;
       var arcHorizontalSpacing = 10; // min space boxes with connecting arc
       var rowSpacing = -5;          // for some funny reason approx. -10 gives "tight" packing.
-      var sentNumMargin = 31;
+      var sentNumMargin = 310;
       var smoothArcCurves = true;   // whether to use curves (vs lines) in arcs
       var smoothArcSteepness = 0.5; // steepness of smooth curves (control point)
       var reverseArcControlx = 5;   // control point distance for "UFO catchers"
@@ -537,8 +539,9 @@ var Visualizer = (function($, window, undefined) {
       var setData = function(_sourceData) {
         if (!args) args = {};
         sourceData = _sourceData;
-        dispatcher.post('newSourceData', [sourceData]);
-        data = new DocumentData(sourceData.text);
+          dispatcher.post('newSourceData', [sourceData]);
+	  console.log(sourceData);
+          data = new DocumentData(sourceData.text, sourceData.document, sourceData.collection);
 
         // collect annotation data
         $.each(sourceData.entities, function(entityNo, entity) {
@@ -2772,6 +2775,7 @@ Util.profileStart('rows');
         // position the rows
         var y = Configuration.visual.margin.y;
         var sentNumGroup = svg.group({'class': 'sentnum'});
+        var sentNumGroup2 = svg.group({'class': 'sentnum'});
         var currentSent;
         $.each(rows, function(rowId, row) {
           // find the maximum fragment height
@@ -2825,22 +2829,31 @@ Util.profileStart('rows');
           row.textY = y - rowPadding;
           if (row.sentence) {
             var sentence_hash = new URLHash(coll, doc, { focus: [[ 'sent', row.sentence ]] } );
-            var link = svg.link(sentNumGroup, sentence_hash.getHash());
-
+	    var link = svg.link(sentNumGroup, sentence_hash.getHash());
+	    var link2 = svg.link(sentNumGroup2, sentence_hash.getHash());
+          
             // Render sentence number as a link
-            var text;
+              var text;
+	      // Need to compute (or get from server) this number
+	      var sent_ann_info = "annotations for sentence " + row.sentence + ", file " + data.collection + data.document; 
             if (rtlmode) {
               text = svg.text(link, canvasWidth - sentNumMargin + Configuration.visual.margin.x, y - rowPadding,
                   '' + row.sentence, { 'data-sent': row.sentence });
+              text = svg.text(link, canvasWidth - sentNumMargin + Configuration.visual.margin.x, y - rowPadding - 50,
+			      '' + sent_ann_info, { 'data-sent': row.sentence });
             } else {
               text = svg.text(link, sentNumMargin - Configuration.visual.margin.x, y - rowPadding,
                   '' + row.sentence, { 'data-sent': row.sentence });
+              text2 = svg.text(link2, sentNumMargin - Configuration.visual.margin.x, y - rowPadding - 50,
+			       '' + sent_ann_info, { 'data-sent': row.sentence });
             }
 
             var sentComment = data.sentComment[row.sentence];
             if (sentComment) {
               var box = text.getBBox();
+              var box2 = text2.getBBox();
               svg.remove(text);
+              svg.remove(text2);
               // TODO: using rectShadowSize, but this shadow should
               // probably have its own setting for shadow size
               shadowRect = svg.rect(link,
@@ -2852,6 +2865,17 @@ Util.profileStart('rows');
                   rx: rectShadowRounding,
                   ry: rectShadowRounding,
                   'data-sent': row.sentence,
+              });
+
+		shadowRect2 = svg.rect(link2,
+                  box2.x - rectShadowSize, box2.y - rectShadowSize,
+                  box2.width + 2 * rectShadowSize, box2.height + 2 * rectShadowSize, {
+
+                  'class': 'sent shadow_' + sentComment.type,
+                  filter: 'url(#Gaussian_Blur)',
+                  rx: rectShadowRounding,
+                  ry: rectShadowRounding,
+                  'data-sent': 'other other',
               });
 
               // Render sentence comment

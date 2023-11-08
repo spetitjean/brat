@@ -843,7 +843,29 @@ def _enrich_json_with_data(j_dic, ann_obj):
     ann_files = sorted([p for p in set(ann_files)])
     j_dic['source_files'] = ann_files
 
-
+    # check for other annotations of the same sentences
+    j_dic['other_annotations'] = [1,2]
+    j_dic['test'] = ann_obj._document
+    j_dic['data_dir'] = DATA_DIR
+    rel_path_to_doc = ann_obj._document[len(DATA_DIR) + 1 :].split('/')
+    project_path = DATA_DIR + '/' + rel_path_to_doc[0]
+    other_users = listdir(project_path)
+    # get the other users who annotated in this project (filtering hidden files)
+    other_users = [user for user in other_users if user[0] != '.']
+    # need to filter conf files and directories which do not stand for users (diff, judge?)
+    other_users = [user for user in other_users if user != 'annotation.conf' and user != 'diff']
+    j_dic['other_users'] = other_users
+    
+    path_exists = dict()
+    for user in other_users:
+        #check if there is a ann file
+        if os.path.exists('/'.join([project_path] + [user] + rel_path_to_doc[2:]) + '.ann'):
+            path_exists[user] = 'yes'
+        else:
+            path_exists[user] = 'no'
+    j_dic['path_exists'] = path_exists
+        
+    
 def _enrich_json_with_base(j_dic):
     # TODO: Make the names here and the ones in the Annotations object conform
 
@@ -862,6 +884,7 @@ def _enrich_json_with_base(j_dic):
         'equivs',
         'normalizations',
         'comments',
+        'other_annotations',
     ):
         j_dic[d] = []
 
